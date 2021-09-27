@@ -57,8 +57,8 @@ export class OauthService {
       return true;
     }
 
-    const tokenDecoded: {exp: number} = jwt_decode(this.token.access_token);
-    
+    const tokenDecoded: { exp: number } = jwt_decode(this.token.access_token);
+
     if (tokenDecoded) {
       if (new Date(tokenDecoded.exp * 1000) > new Date()) {
         return false;
@@ -66,5 +66,10 @@ export class OauthService {
       return true;
     }
     return true;
+  }
+
+  removeToken() {
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("refresh_token");
   }
 }

@@ -29,7 +29,17 @@ export class UsuarioService {
     return this.httpClient.get<Usuario>(`${this.BASE_PATH}/${id}`);
   }
 
-  listAllAvisosByUsuario(id: number): Promise<AxiosResponse<Avisos[]>> {
+  listAllAvisos(id: number): Promise<AxiosResponse<Avisos[]>> {
     return this.httpClient.get<Avisos[]>(`${this.BASE_PATH}/${id}/avisos`);
+  }
+
+  confirmarAmizade(
+    id: number,
+    novoContato: Usuario
+  ): Promise<AxiosResponse<Conversa>> {
+    return this.httpClient.post<Conversa>(
+      `${this.BASE_PATH}/${id}/confirmar-amizade`,
+      novoContato
+    );
   }
 }

@@ -8,17 +8,17 @@ import { PrivateRoute } from "./shared/components/PrivateRoute";
 
 const App = () => {
   return (
-    <div style={{textAlign: 'center'}}>
+    <div style={{ textAlign: "center" }}>
       <BrowserRouter forceRefresh>
-          <Switch>
-            <Route path="/login" exact component={Login} />
-            <Route path="/signin" exact component={SignUp} />
-            <PrivateRoute path="/home" exact component={Home} />
-            <Route exact path="/">
-              <Redirect to="/login" />
-            </Route>
-            <Route component={NotFound404} />
-          </Switch>
+        <Switch>
+          <Route path="/login" exact component={Login} />
+          <Route path="/signin" exact component={SignUp} />
+          <PrivateRoute path="/home" exact component={Home} />
+          <Route exact path="/">
+            <Redirect to="/login" />
+          </Route>
+          <Route component={NotFound404} />
+        </Switch>
       </BrowserRouter>
     </div>
   );

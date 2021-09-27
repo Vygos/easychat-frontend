@@ -117,7 +117,7 @@ const Navbar = () => {
                 onAddContato={onAddContato}
               />
             </Grid>
-            <EndNavbar userPrincipal={userPrincipal}/>
+            <EndNavbar />
           </Grid>
         </Toolbar>
       </AppBar>

@@ -8,9 +8,11 @@ import {
 } from "@material-ui/core";
 import { useFormik } from "formik";
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { Link, useHistory } from "react-router-dom";
 import * as yup from "yup";
 import { Usuario } from "../../model/usuario.model";
+import { loadUsuario } from "../../redux/slices/usuario/usuarioSlice";
 import { OauthService } from "../../service/oauth.service";
 import Input from "../../shared/components/Input";
 import { Spinner } from "../../shared/components/Spinner";
@@ -43,9 +45,11 @@ const schema = yup.object({
   password: yup.string().required("Campo obrigatório"),
 });
 
-function Login({ ...props }) {
+function Login() {
   const classes = useStyles();
   const oauthService = new OauthService();
+  const dispatch = useDispatch();
+  const history = useHistory();
 
   const [toast, setToast] = useState({ open: false, msg: "", severity: "success" });
   const [loading, setLoading] = useState<boolean>(false);
@@ -59,8 +63,9 @@ function Login({ ...props }) {
     oauthService
     .getToken(usuario)
     .then((response) => {
-      props.history.push("/home");
       oauthService.setToken(response.data);
+      dispatch(loadUsuario(oauthService.userFromToken.id))
+      history.push("/home");
     })
     .catch((e) => {
       setToast({...toast, open: true, msg: "Email/Senha não conferem", severity: 'error'})

@@ -1,8 +1,8 @@
 import {
+  Avatar,
+  Badge,
   Grid,
   IconButton,
-  Badge,
-  Avatar,
   Menu,
   MenuItem,
   Theme,
@@ -10,17 +10,28 @@ import {
 } from "@material-ui/core";
 import { deepOrange } from "@material-ui/core/colors";
 import {
-  Notifications,
-  ExitToApp,
-  Watch,
   CheckCircleOutline,
+  ExitToApp,
+  Notifications,
 } from "@material-ui/icons";
 import { makeStyles } from "@material-ui/styles";
 import { forwardRef, useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useHistory } from "react-router";
 import { rxStomp } from "../../config/ws/rx-stomp";
 import { Avisos } from "../../model/avisos.model";
 import { TipoAviso } from "../../model/enums/tipo-aviso.enum";
-import { Usuario } from "../../model/usuario.model";
+import {
+  avisosSelector,
+  AvisosState,
+  deletarAviso,
+  novoAviso,
+} from "../../redux/slices/avisos/avisosSlice";
+import { novaConversa } from "../../redux/slices/conversas/conversasSlice";
+import {
+  usuarioSelector,
+  UsuarioState,
+} from "../../redux/slices/usuario/usuarioSlice";
 import { OauthService } from "../../service/oauth.service";
 import { UsuarioService } from "../../service/usuario.service";
 
@@ -32,15 +43,20 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-export const EndNavbar = ({ userPrincipal }: { userPrincipal: Usuario }) => {
+export const EndNavbar = () => {
   const classes = useStyles();
+  const dispatch = useDispatch();
+
   const usuarioService = new UsuarioService();
   const oauthService = new OauthService();
 
   const [anchorElAccount, setAnchorElAccount] = useState<HTMLElement>(null);
   const [anchorElAvisos, setAnchorElAvisos] = useState<HTMLElement>(null);
-  const [avisos, setAvisos] = useState<Avisos[]>(null);
-  const [newAviso, setNewAviso] = useState<Avisos>(null);
+
+  const { usuario } = useSelector(usuarioSelector) as UsuarioState;
+  const { avisos } = useSelector(avisosSelector) as AvisosState;
+
+  const history = useHistory();
 
   const isMenuOpenAccount = Boolean(anchorElAccount);
   const isMenuOpenAvisos = Boolean(anchorElAvisos);
@@ -50,28 +66,15 @@ export const EndNavbar = ({ userPrincipal }: { userPrincipal: Usuario }) => {
     : avisos;
 
   useEffect(() => {
-    usuarioService
-      .listAllAvisosByUsuario(oauthService.userFromToken.id)
-      .then((response) => setAvisos(response.data));
-  }, []);
-
-  useEffect(() => {
-    if (userPrincipal) {
+    if (usuario) {
       rxStomp
-        .watch("/topic/avisos." + userPrincipal.dadosPessoais.username)
+        .watch("/topic/avisos." + usuario.dadosPessoais.username)
         .subscribe((message) => {
-          const aviso = JSON.parse(message.body);
-          setNewAviso(aviso);
+          const newAviso = JSON.parse(message.body);
+          dispatch(novoAviso(newAviso));
         });
     }
-  }, [userPrincipal]);
-
-  useEffect(() => {
-    if (!newAviso) {
-      return;
-    }
-    setAvisos([...avisos, newAviso]);
-  }, [newAviso]);
+  }, [usuario]);
 
   const handleMenuClose = () => {
     setAnchorElAccount(null);
@@ -85,12 +88,29 @@ export const EndNavbar = ({ userPrincipal }: { userPrincipal: Usuario }) => {
     setAnchorElAvisos(event.currentTarget);
   };
 
-  const handleMenuCloseAvisos = (aviso) => {
+  const handleMenuCloseAvisos = (aviso: Avisos) => {
     setAnchorElAvisos(null);
 
-    const newAvisos = avisos.filter((avs) => avs.id !== aviso.id);
-    setAvisos(newAvisos);
+    if (aviso) {
+      usuarioService
+        .confirmarAmizade(usuario.id, aviso.contato)
+        .then((response) => {
+          
+          const payload = {
+            conversa: response.data,
+            idUsuario: usuario.id
+          }
+          
+          dispatch(deletarAviso(aviso));
+          dispatch(novaConversa(payload));
+        });
+    }
   };
+
+  const handleLogout = () => {
+    oauthService.removeToken();
+    history.push("/login");
+  }
 
   const MenuAccount = () => (
     <Menu
@@ -114,13 +134,14 @@ export const EndNavbar = ({ userPrincipal }: { userPrincipal: Usuario }) => {
 
     return (
       <>
-        {avisos && avisos.map((aviso) => {
-          return (
-            aviso.tipo == TipoAviso.PEDIDO_AMIZADE && (
-              <PedidoAmizade key={aviso.id} aviso={aviso} />
-            )
-          );
-        })}
+        {avisos &&
+          avisos.map((aviso) => {
+            return (
+              aviso.tipo == TipoAviso.PEDIDO_AMIZADE && (
+                <PedidoAmizade key={aviso.id} aviso={aviso} />
+              )
+            );
+          })}
       </>
     );
   });
@@ -128,17 +149,19 @@ export const EndNavbar = ({ userPrincipal }: { userPrincipal: Usuario }) => {
   const PedidoAmizade = ({ aviso }: { aviso: Avisos }) => {
     return (
       <MenuItem>
-        <Grid item xs={4}>
-          <Avatar className={classes.avatar}>
+        <Grid container spacing={2}>
+          <Grid item xs={2}>
+            <Avatar className={classes.avatar}>
+              <Typography variant="caption">
+                {aviso.contato.dadosPessoais.nome.toUpperCase().substring(0, 2)}
+              </Typography>
+            </Avatar>
+          </Grid>
+          <Grid item xs={6}>
             <Typography variant="caption">
-              {aviso.contato.dadosPessoais.nome.toUpperCase().substring(0, 2)}
+              {aviso.contato.dadosPessoais.username} {aviso.descricao}
             </Typography>
-          </Avatar>
-        </Grid>
-        <Grid item xs={6}>
-          <Typography variant="caption">
-            {aviso.contato.dadosPessoais.username} {aviso.descricao}
-          </Typography>
+          </Grid>
         </Grid>
         <Grid container justifyContent="flex-end">
           <IconButton
@@ -163,12 +186,12 @@ export const EndNavbar = ({ userPrincipal }: { userPrincipal: Usuario }) => {
           <Notifications />
         </Badge>
       </IconButton>
-      <IconButton color="inherit">
+      <IconButton color="inherit" onClick={handleLogout}>
         <ExitToApp />
       </IconButton>
       <IconButton
         edge="end"
-        aria-label="account of current user"
+        aria-label="logout"
         aria-haspopup="true"
         onClick={handleProfileMenuOpen}
         color="inherit"

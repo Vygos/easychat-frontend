@@ -4,10 +4,10 @@ import _ from "lodash";
 import { useCallback, useState } from "react";
 import { Link } from "react-router-dom";
 import * as yup from "yup";
-import { UsuarioService } from "../service/usuario.service";
-import Input from "../shared/components/Input";
-import Toast from "../shared/components/Toast";
-import { Messages } from "../shared/messages/validation-messages";
+import { UsuarioService } from "../../service/usuario.service";
+import Input from "../../shared/components/Input";
+import Toast from "../../shared/components/Toast";
+import { Messages } from "../../shared/messages/validation-messages";
 import "./SignUp.css";
 
 const useStyles = makeStyles((theme) => ({

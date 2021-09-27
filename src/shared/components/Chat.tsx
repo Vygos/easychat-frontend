@@ -9,11 +9,17 @@ import {
   Typography,
 } from "@material-ui/core";
 import { useEffect, useMemo, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { rxStomp } from "../../config/ws/rx-stomp";
 import { Conversa } from "../../model/conversa.model";
 import { Mensagem } from "../../model/mensagem.model";
 import { mensagensToMessagesMapper } from "../../model/mensagens-to-message.mapper";
 import { Usuario } from "../../model/usuario.model";
+import {
+  conversaSelector,
+  ConversasState,
+  novaMensagem,
+} from "../../redux/slices/conversas/conversasSlice";
 import { messagesMock } from "../utils/messages-mocks";
 import { Message, MessageSent } from "./chat/mui/chat-types";
 import { MuiChat } from "./chat/mui/MuiChat";
@@ -36,30 +42,36 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     avatar: {
       width: theme.spacing(5),
-      height: theme.spacing(5)
-    }
+      height: theme.spacing(5),
+    },
   })
 );
 
 export const Chat = ({
-  conversa,
   usuarioSender,
   ...props
 }: {
-  conversa: Conversa | undefined;
   usuarioSender: Usuario;
 }) => {
   const classes = useStyles();
-  const [messages, setMessages] = useState<Message[]>([]);
   const rxStompWS = rxStomp;
+  const dispatch = useDispatch();
+
+  const [messages, setMessages] = useState([]);
+
+  const conversaAtual = useSelector(conversaSelector) as Conversa;
+
+  console.log("conversaAtual", conversaAtual)
 
   useEffect(() => {
-    if (conversa) {
-      const messagesMap = mensagensToMessagesMapper(conversa.mensagens, usuarioSender)
+    if (conversaAtual) {
+      const messagesMap = mensagensToMessagesMapper(
+        conversaAtual.mensagens,
+        usuarioSender
+      );
       setMessages(messagesMap);
     }
-
-  }, [conversa])
+  }, [conversaAtual]);
 
   const onSend = (messageSent: MessageSent) => {
     const message = {
@@ -74,16 +86,19 @@ export const Chat = ({
       dtMensagem: messageSent.date,
       usuario: usuarioSender,
       conversa: {
-        id: conversa.id
-      }
+        id: conversaAtual.id,
+      },
     } as Mensagem;
-
-    conversa.mensagens.push(mensagem);
     
+    dispatch(novaMensagem(mensagem));
+
     rxStompWS.publish({
       body: JSON.stringify(mensagem),
-      destination: "/app/chat." + conversa?.usuarios[0].dadosPessoais?.username,
+      destination:
+        "/app/chat." + conversaAtual?.usuarios[0].dadosPessoais?.username,
     });
+
+
     setMessages([...messages, message]);
   };
 
@@ -101,13 +116,15 @@ export const Chat = ({
             <Grid item>
               <Avatar className={classes.avatar}>
                 <Typography variant="subtitle1">
-                  {conversa?.usuarios[0].dadosPessoais?.nome?.toUpperCase().substring(0, 2)}
+                  {conversaAtual?.usuarios[0].dadosPessoais?.nome
+                    ?.toUpperCase()
+                    .substring(0, 2)}
                 </Typography>
               </Avatar>
             </Grid>
             <Grid item>
-              <Typography variant="subtitle1" style={{marginTop: '6px'}}>
-                {conversa?.usuarios[0].dadosPessoais?.nome}
+              <Typography variant="subtitle1" style={{ marginTop: "6px" }}>
+                {conversaAtual?.usuarios[0].dadosPessoais?.nome}
               </Typography>
             </Grid>
           </Grid>

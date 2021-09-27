@@ -6,6 +6,7 @@ export class Conversa {
   nome: string;
   mensagens: Mensagem[];
   usuarios: Usuario[];
+  badge: number = 0;
 
   constructor(init: Partial<Conversa>) {
     Object.assign(this, init);
