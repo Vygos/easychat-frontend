@@ -22,8 +22,7 @@ const reducers = combineReducers<Root>({
 });
 
 const store = configureStore({
-  reducer: reducers,
-  middleware: getDefaultMiddleware({ serializableCheck: false }),
+  reducer: reducers
 });
 
 export default store;

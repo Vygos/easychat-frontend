@@ -5,10 +5,11 @@ import Login from "./pages/login/Login";
 import { NotFound404 } from "./pages/notfound/NotFound404";
 import SignUp from "./pages/singup/SignUp";
 import { PrivateRoute } from "./shared/components/PrivateRoute";
+import './App.css'
 
 const App = () => {
   return (
-    <div style={{ textAlign: "center" }}>
+    <div className="app">
       <BrowserRouter forceRefresh>
         <Switch>
           <Route path="/login" exact component={Login} />

@@ -9,9 +9,9 @@ export interface Message {
   self: boolean;
   username?: string;
   avatar?: string;
-  createdAt?: Date;
-  updatedAt?: Date;
-  deletedAt?: Date;
+  createdAt?: Date | string;
+  updatedAt?: Date | string;
+  deletedAt?: Date | string;
 }
 
 export type MessageContent = string | JSX.Element;

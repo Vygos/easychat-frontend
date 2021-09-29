@@ -4,7 +4,7 @@ import { Usuario } from "./usuario.model";
 export class Mensagem {
     id: string;
     conteudo: string;
-    dtMensagem: Date;
+    dtMensagem: Date | string;
     usuario: Usuario;
     conversa: Conversa;
 }

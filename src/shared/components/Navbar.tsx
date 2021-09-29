@@ -22,7 +22,7 @@ import { EndNavbar } from "./EndNavbar";
 import { SearchUserAutocomplete } from "./SearchUserAutocomplete";
 import Toast from "./Toast";
 
-const drawerWidth = 240;
+const drawerWidth = 300;
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({

@@ -3,7 +3,7 @@ const URLS: string[] = [
 ]
 
 const WHITE_LIST = [
-    "/existsByEmail/",
+    "/usuario/existsByEmail",
     "/oauth/token"
 ]
 

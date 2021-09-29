@@ -61,8 +61,6 @@ export const Chat = ({
 
   const conversaAtual = useSelector(conversaSelector) as Conversa;
 
-  console.log("conversaAtual", conversaAtual)
-
   useEffect(() => {
     if (conversaAtual) {
       const messagesMap = mensagensToMessagesMapper(
@@ -83,7 +81,7 @@ export const Chat = ({
 
     let mensagem = {
       conteudo: messageSent.content,
-      dtMensagem: messageSent.date,
+      dtMensagem: (messageSent.date as Date).toISOString(),
       usuario: usuarioSender,
       conversa: {
         id: conversaAtual.id,

@@ -4,7 +4,8 @@ export enum Messages {
   MSG003 = "Senhas não correspondem",
   MSG004 = "Email já cadastrado",
   MSG005 = "Cadastro Realizado com sucesso!",
-  MSG006 = "Pedido de amizade enviado com sucesso"
+  MSG006 = "Pedido de amizade enviado com sucesso",
+  MSG007 = "Ocorreu algum erro durante a operação, tente novamente mais tarde!"
 }
 
 export class MessageHelper {

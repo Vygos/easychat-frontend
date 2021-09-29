@@ -9,6 +9,12 @@ export class UsuarioService {
 
   private readonly BASE_PATH = "usuario";
 
+  cadastrar(usuario: Usuario, headers) {
+    return this.httpClient.post<Usuario>(`${this.BASE_PATH}`, usuario, {
+      headers,
+    });
+  }
+
   existsByEmail(email: string) {
     return this.httpClient.get(`${this.BASE_PATH}/existsByEmail`, {
       params: { email },

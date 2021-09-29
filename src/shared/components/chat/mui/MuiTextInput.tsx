@@ -1,12 +1,15 @@
-import { Button, TextField, Theme, makeStyles } from "@material-ui/core";
-import { Send as SendIcon } from "@material-ui/icons";
-import React, { useState } from "react";
-
 import {
-  MessageSent,
-  TextActionRequest,
-  TextActionResponse,
-} from "../mui/chat-types";
+  Button,
+  makeStyles,
+  Menu,
+  MenuItem,
+  TextField,
+  Theme,
+} from "@material-ui/core";
+import { EmojiEmotionsOutlined, Send as SendIcon } from "@material-ui/icons";
+import React, { useRef, useState } from "react";
+import { MessageSent } from "../mui/chat-types";
+import { EmojiPicker } from "./EmojiPicker";
 
 const useStyles = makeStyles((theme: Theme) => ({
   container: {
@@ -23,6 +26,9 @@ const useStyles = makeStyles((theme: Theme) => ({
       flex: "0 1 auto",
     },
   },
+  emoji: {
+    maxWidth: theme.spacing(8),
+  },
 }));
 
 export function MuiTextInput({
@@ -30,11 +36,15 @@ export function MuiTextInput({
   scroll,
   ...props
 }: {
-  onSend: (message: MessageSent) => void,
-  scroll: () => void
+  onSend: (message: MessageSent) => void;
+  scroll: () => void;
 }): React.ReactElement {
   const classes = useStyles();
   const [value, setValue] = useState<string>("");
+  const [anchorEl, setAnchorEl] = useState<HTMLElement>(null);
+  const ref = useRef(null);
+
+  const isMenuOpen = Boolean(anchorEl);
 
   const handleKeyDown = (e: any): void => {
     if (e.nativeEvent.isComposing) {
@@ -44,20 +54,33 @@ export function MuiTextInput({
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       onSend({ content: value, date: new Date() });
-      setValue("")
+      setValue("");
     }
   };
 
   const handleClick = () => {
     onSend({ content: value, date: new Date() });
-    setValue("")
-  }
+    setValue("");
+  };
+
+  const handleMenuOpen = (e: any) => {
+    setAnchorEl(e.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+
+    setTimeout(() => {
+      ref.current.focus();
+    }, 500);
+  };
 
   const sendButtonText = "Enviar";
 
   return (
     <div className={classes.container}>
       <TextField
+        ref={ref}
         placeholder="Digite uma mensagem"
         value={value}
         onChange={(e): void => setValue(e.target.value)}
@@ -67,6 +90,16 @@ export function MuiTextInput({
         variant="outlined"
         maxRows={10}
       />
+      <Button
+        type="button"
+        aria-haspopup="true"
+        className={classes.emoji}
+        variant="contained"
+        color="primary"
+        onClick={handleMenuOpen}
+      >
+        <EmojiEmotionsOutlined />
+      </Button>
       <Button
         type="button"
         onClick={handleClick}

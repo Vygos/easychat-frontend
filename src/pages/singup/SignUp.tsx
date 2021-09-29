@@ -1,9 +1,18 @@
-import { Button, Card, Container, Grid, makeStyles, Typography } from "@material-ui/core";
+import {
+  Button,
+  Card,
+  Container,
+  Grid,
+  makeStyles,
+  Typography,
+} from "@material-ui/core";
 import { useFormik } from "formik";
 import _ from "lodash";
 import { useCallback, useState } from "react";
 import { Link } from "react-router-dom";
 import * as yup from "yup";
+import { Usuario } from "../../model/usuario.model";
+import { OauthService } from "../../service/oauth.service";
 import { UsuarioService } from "../../service/usuario.service";
 import Input from "../../shared/components/Input";
 import Toast from "../../shared/components/Toast";
@@ -28,9 +37,10 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const usuarioService = new UsuarioService();
 
 export default function SignUp() {
+  const oauthService = new OauthService();
+  const usuarioService = new UsuarioService();
 
   const [toast, setToast] = useState({ open: false, msg: "", severity: "" });
 
@@ -40,7 +50,13 @@ export default function SignUp() {
         return usuarioService
           .existsByEmail(value)
           .then((response) => resolve(!response.data))
-          .catch((e) => setToast({open: true, severity: 'error', msg: 'Erro interno do servidor, tente mais tarde !'}));
+          .catch((e) =>
+            setToast({
+              open: true,
+              severity: "error",
+              msg: "Erro interno do servidor, tente mais tarde !",
+            })
+          );
       }
       return resolve(true);
     });
@@ -68,15 +84,47 @@ export default function SignUp() {
       }),
   });
 
-  const handleSubmit = (values: any) => {
-    console.log("values", values);
-    setToast({
-      ...toast,
-      open: true,
-      msg: Messages.MSG005,
-      severity: "success",
-    });
-    formik.resetForm();
+  const handleSubmit = async (values: any) => {
+    const sistema = {
+      email: "sistema@easychat.com",
+      password: "sistema@123",
+    } as Usuario;
+
+    const newUsuario = {
+      email: values.email,
+      password: values.password,
+      dadosPessoais: {
+        nome: values.nome,
+        username: values.username,
+      },
+    } as Usuario;
+
+    try {
+      const { data } = await oauthService.getToken(sistema);
+
+      const header = { Authorization: `Bearer ${data.access_token}` };
+
+      console.log("header", header);
+
+      await usuarioService.cadastrar(newUsuario, header);
+
+      formik.resetForm();
+
+      setToast({
+        ...toast,
+        open: true,
+        msg: Messages.MSG005,
+        severity: "success",
+      });
+
+    } catch (e) {
+      setToast({
+        ...toast,
+        open: true,
+        msg: Messages.MSG007,
+        severity: "error",
+      });
+    }
   };
 
   const formik = useFormik({

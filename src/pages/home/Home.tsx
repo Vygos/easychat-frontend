@@ -36,7 +36,7 @@ import { NoChatSelected } from "../../shared/components/NoChatSelected";
 import { ProfilePicture } from "../../shared/components/ProfilePicture";
 import { Spinner } from "../../shared/components/Spinner";
 
-const drawerWidth = 240;
+const drawerWidth = 300;
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -104,6 +104,7 @@ function Home() {
 
   useEffect(() => {
     if (!isAlreadyRegistered) {
+      
       //subscribe to new Messages
       rxStompWS
         .watch("/topic/chat." + usuario?.dadosPessoais?.username)

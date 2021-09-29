@@ -16,8 +16,12 @@ const useStyles = makeStyles((theme: Theme) => ({
     width: theme.spacing(4),
     height: theme.spacing(4),
   },
-  listItem: {
+  listItemSelected: {
     backgroundColor: "rgb(0, 0, 0, 0.04)",
+    height: theme.spacing(8),
+  },
+  listItem: {
+    height: theme.spacing(8),
   },
 }));
 
@@ -33,7 +37,10 @@ export const Contato = ({
 
   return (
     <>
-      <ListItem className={selected ? classes.listItem : null} button>
+      <ListItem
+        className={selected ? classes.listItemSelected : classes.listItem}
+        button
+      >
         <ListItemIcon>
           <Avatar className={classes.size}>
             <Typography variant="caption">
@@ -44,7 +51,7 @@ export const Contato = ({
           </Avatar>
         </ListItemIcon>
         <ListItemText primary={conversa.usuarios[0].dadosPessoais?.nome} />
-        <Badge color="error" badgeContent={conversa.badge}></Badge>
+        <Badge color="primary" badgeContent={conversa.badge}></Badge>
       </ListItem>
       <Divider />
     </>
