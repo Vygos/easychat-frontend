@@ -98,7 +98,7 @@ const Navbar = () => {
           <Grid container direction="row" alignItems="center" spacing={2}>
             <Grid item>
               <Typography variant="h6" className={classes.title}>
-                Easychat
+                <b>Easychat</b>
               </Typography>
             </Grid>
             <Grid item>

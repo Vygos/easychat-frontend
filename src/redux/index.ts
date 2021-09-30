@@ -3,6 +3,7 @@ import {
   configureStore,
   getDefaultMiddleware,
 } from "@reduxjs/toolkit";
+import { enviroment } from "../env/easychat.env";
 import avisosSlice, { AvisosState } from "./slices/avisos/avisosSlice";
 import conversaSlice, {
   ConversasState,
@@ -22,7 +23,8 @@ const reducers = combineReducers<Root>({
 });
 
 const store = configureStore({
-  reducer: reducers
+  reducer: reducers,
+  devTools: !enviroment.production
 });
 
 export default store;

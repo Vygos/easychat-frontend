@@ -15,7 +15,7 @@ const theme =  createTheme({
         tonalOffset: 0.2,
     },
     typography: {
-        fontFamily: `"Varela Round", "Roboto", "Helvetica", "Arial", sans-serif`
+        fontFamily: `"Work Sans", "Roboto", "Helvetica", "Arial", sans-serif`
     },
 })
 
