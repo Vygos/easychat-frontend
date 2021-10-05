@@ -45,6 +45,15 @@ export const loadUsuario = (id: number) => async (dispatch) => {
   }
 };
 
+export const updateUsuario = (usuario: Usuario) => async (dispatch) => {
+  try {
+    const { data } = await usuarioService.atualizar(usuario);
+    dispatch(assignUsuario(data));
+  } catch (e) {
+    dispatch(errorLoadingUsuario());
+  }
+};
+
 // ====== SELECTORS ===========
 
 export const usuarioSelector = (state: any) => state.usuarioInfo;

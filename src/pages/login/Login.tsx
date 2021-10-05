@@ -11,9 +11,7 @@ import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { Link, useHistory } from "react-router-dom";
 import * as yup from "yup";
-import { enviroment } from "../../env/easychat.env";
 import { Usuario } from "../../model/usuario.model";
-import { loadUsuario } from "../../redux/slices/usuario/usuarioSlice";
 import { OauthService } from "../../service/oauth.service";
 import Input from "../../shared/components/Input";
 import { Spinner } from "../../shared/components/Spinner";
@@ -52,7 +50,11 @@ function Login() {
   const dispatch = useDispatch();
   const history = useHistory();
 
-  const [toast, setToast] = useState({ open: false, msg: "", severity: "success" });
+  const [toast, setToast] = useState({
+    open: false,
+    msg: "",
+    severity: "success",
+  });
   const [loading, setLoading] = useState<boolean>(false);
 
   const handleSubmit = (values: any) => {
@@ -62,17 +64,21 @@ function Login() {
 
   const efetuarLogin = (usuario: Usuario) => {
     oauthService
-    .getToken(usuario)
-    .then((response) => {
-      oauthService.setToken(response.data);
-      dispatch(loadUsuario(oauthService.userFromToken.id))
-      history.push("/home");
-    })
-    .catch((e) => {
-      setToast({...toast, open: true, msg: "Email/Senha não conferem", severity: 'error'})
-    })
-    .finally(() => setLoading(false));
-  }
+      .getToken(usuario)
+      .then((response) => {
+        oauthService.setToken(response.data);
+        history.push("/home");
+      })
+      .catch((e) => {
+        setToast({
+          ...toast,
+          open: true,
+          msg: "Email/Senha não conferem",
+          severity: "error",
+        });
+      })
+      .finally(() => setLoading(false));
+  };
 
   const formik = useFormik({
     initialValues: {

@@ -38,7 +38,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
-export default function SignUp() {
+export function SignUp() {
   const oauthService = new OauthService();
   const usuarioService = new UsuarioService();
 

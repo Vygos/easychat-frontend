@@ -5,7 +5,7 @@ import {
   Grid,
   makeStyles,
   Theme,
-  Typography,
+  Typography
 } from "@material-ui/core";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -21,12 +21,12 @@ import {
   loadConversas,
   novaConversa,
   novaMensagem,
-  selectConversa,
+  selectConversa
 } from "../../redux/slices/conversas/conversasSlice";
 import {
   loadUsuario,
   usuarioSelector,
-  UsuarioState,
+  UsuarioState
 } from "../../redux/slices/usuario/usuarioSlice";
 import { OauthService } from "../../service/oauth.service";
 import { Chat } from "../../shared/components/Chat";
@@ -92,10 +92,7 @@ function Home() {
 
     dispatch(loadConversas(idUsuario));
     dispatch(loadAvisos(idUsuario));
-
-    if (!usuario) {
-      dispatch(loadUsuario(idUsuario));
-    }
+    dispatch(loadUsuario(idUsuario));
   }, []);
 
   const rxStompWS = rxStomp;
@@ -148,6 +145,10 @@ function Home() {
     dispatch(cleanBadge(conversa));
   };
 
+  const getFoto = () => {
+    return usuario && usuario.dadosPessoais.foto ? usuario.dadosPessoais.foto : ""
+  }
+
   const Contatos = () => (
     <div className={classes.contacts}>
       {conversas &&
@@ -175,7 +176,7 @@ function Home() {
         color="primary"
         classes={{ paper: classes.drawer }}
       >
-        <ProfilePicture />
+        <ProfilePicture base64={getFoto()} />
         <Grid container justifyContent="center">
           <Typography variant="body1">{usuario?.dadosPessoais?.nome}</Typography>
         </Grid>

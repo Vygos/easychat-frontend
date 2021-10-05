@@ -15,6 +15,14 @@ export class UsuarioService {
     });
   }
 
+  atualizar(usuario: Usuario) {
+    return this.httpClient.patch<Usuario>(
+      `${this.BASE_PATH}/${usuario.id}`,
+      usuario,
+      {}
+    );
+  }
+
   existsByEmail(email: string) {
     return this.httpClient.get(`${this.BASE_PATH}/existsByEmail`, {
       params: { email },
@@ -46,6 +54,18 @@ export class UsuarioService {
     return this.httpClient.post<Conversa>(
       `${this.BASE_PATH}/${id}/confirmar-amizade`,
       novoContato
+    );
+  }
+
+  uploadFoto(id: number, file): Promise<AxiosResponse<Usuario>>  {
+
+    const formData = new FormData();
+
+    formData.append("arquivo", file);
+
+    return this.httpClient.post<Usuario>(
+      `${this.BASE_PATH}/${id}/upload`,
+      formData
     );
   }
 }

@@ -13,8 +13,10 @@ const useStyle = makeStyles((theme: Theme) =>
   })
 );
 
-export const ProfilePicture = () => {
+export const ProfilePicture = ({base64} : {base64?: string}) => {
   const classes = useStyle();
+
+  const url = 'https://cdn.myanimelist.net/images/characters/15/422168.jpg';
 
   return (
     <div className={classes.root}>
@@ -23,7 +25,7 @@ export const ProfilePicture = () => {
           <Avatar
             className={classes.large}
             alt="profile img"
-            src="https://cdn.myanimelist.net/images/characters/15/422168.jpg"
+            src={base64}
           />
         </div>
       </Grid>

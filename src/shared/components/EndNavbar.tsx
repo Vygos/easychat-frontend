@@ -5,12 +5,14 @@ import {
   Menu,
   MenuItem,
   Theme,
+  Typography,
 } from "@material-ui/core";
 import { deepOrange } from "@material-ui/core/colors";
-import { ExitToApp } from "@material-ui/icons";
+import { AccountCircle, ExitToApp } from "@material-ui/icons";
 import { makeStyles } from "@material-ui/styles";
 import { useState } from "react";
 import { useHistory } from "react-router";
+import { Link } from "react-router-dom";
 import { OauthService } from "../../service/oauth.service";
 import { AvisosNotification } from "./AvisosNotification";
 
@@ -56,8 +58,10 @@ export const EndNavbar = () => {
       open={isMenuOpenAccount}
       onClose={handleMenuClose}
     >
-      <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
-      <MenuItem onClick={handleMenuClose}>My account</MenuItem>
+      <MenuItem onClick={() => history.push("/profile")}>
+        <AccountCircle />
+        <Typography variant="body1">Perfil</Typography>
+      </MenuItem>
     </Menu>
   );
 
