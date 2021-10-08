@@ -14,6 +14,7 @@ import { deepOrange } from "@material-ui/core/colors";
 import { Chat, ExitToApp, Notifications } from "@material-ui/icons";
 import clsx from "clsx";
 import { useEffect, useState } from "react";
+import { useHistory } from "react-router";
 import { Usuario } from "../../model/usuario.model";
 import { OauthService } from "../../service/oauth.service";
 import { UsuarioService } from "../../service/usuario.service";
@@ -63,6 +64,8 @@ const Navbar = () => {
   const oauthService = new OauthService();
   const usuarioService = new UsuarioService();
 
+  const history = useHistory();
+
   const [toast, setToast] = useState({
     open: false,
     msg: "",
@@ -107,6 +110,7 @@ const Navbar = () => {
                 className={classes.menuButton}
                 color="inherit"
                 aria-label="menu"
+                onClick={() => history.push("/home")}
               >
                 <Chat />
               </IconButton>

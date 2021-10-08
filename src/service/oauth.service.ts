@@ -1,13 +1,11 @@
 import { AxiosResponse } from "axios";
-import { httpClient } from "../config/http/http-client";
+import jwt_decode from "jwt-decode";
 import { enviroment } from "../env/easychat.env";
 import { JWT } from "../model/jwt.model";
 import { Usuario } from "../model/usuario.model";
-import jwt_decode from "jwt-decode";
+import { HttpBaseService } from "./http-base.service";
 
-export class OauthService {
-  private httpClient = httpClient;
-
+export class OauthService extends HttpBaseService {
   private readonly BASE_PATH = "/oauth/token";
 
   getToken(usuario: Usuario): Promise<AxiosResponse<JWT>> {

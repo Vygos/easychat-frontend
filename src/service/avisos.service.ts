@@ -1,9 +1,8 @@
 import { AxiosResponse } from "axios";
-import { httpClient } from "../config/http/http-client";
 import { Avisos } from "../model/avisos.model";
+import { HttpBaseService } from "./http-base.service";
 
-export class AvisosService {
-  private httpClient = httpClient;
+export class AvisosService extends HttpBaseService {
 
   private readonly BASE_PATH = "avisos";
 

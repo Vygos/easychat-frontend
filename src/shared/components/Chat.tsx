@@ -82,12 +82,15 @@ export const Chat = ({
     let mensagem = {
       conteudo: messageSent.content,
       dtMensagem: (messageSent.date as Date).toISOString(),
-      usuario: usuarioSender,
+      usuario: {
+        ...usuarioSender,
+        dadosPessoais: { ...usuarioSender.dadosPessoais, foto: null },
+      },
       conversa: {
         id: conversaAtual.id,
       },
     } as Mensagem;
-    
+
     dispatch(novaMensagem(mensagem));
 
     rxStompWS.publish({
@@ -95,7 +98,6 @@ export const Chat = ({
       destination:
         "/app/chat." + conversaAtual?.usuarios[0].dadosPessoais?.username,
     });
-
 
     setMessages([...messages, message]);
   };

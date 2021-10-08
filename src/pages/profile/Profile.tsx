@@ -12,10 +12,11 @@ import { makeStyles } from "@material-ui/styles";
 import { useFormik } from "formik";
 import moment from "moment";
 import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import * as yup from "yup";
 import { DadosPessoais } from "../../model/dados-pessoais.model";
 import { Usuario } from "../../model/usuario.model";
+import { useAppDispatch } from "../../redux";
 import {
   loadUsuario,
   updateUsuario,
@@ -27,6 +28,8 @@ import { UsuarioService } from "../../service/usuario.service";
 import Input from "../../shared/components/Input";
 import Navbar from "../../shared/components/Navbar";
 import { ProfilePicture } from "../../shared/components/ProfilePicture";
+import { Spinner } from "../../shared/components/Spinner";
+import Toast from "../../shared/components/Toast";
 import { Messages } from "../../shared/messages/validation-messages";
 import { toBase64 } from "../../shared/utils/fileToBase64";
 
@@ -50,20 +53,41 @@ export const Profile = () => {
   const classes = useStyles();
   const oauthService = new OauthService();
   const usuarioService = new UsuarioService();
-  const dispatch = useDispatch();
+  const appDispatch = useAppDispatch;
 
+  const [loading, setLoading] = useState<boolean>(false);
   const [isEditing, setIsEditing] = useState<boolean>(null);
   const [file, setFile] = useState<string>("");
   const [base64, setBase64] = useState<string>(null);
+  const [toast, setToast] = useState({
+    open: false,
+    msg: "",
+    severity: "success",
+  });
 
   const { usuario } = useSelector(usuarioSelector) as UsuarioState;
 
   useEffect(() => {
-    dispatch(loadUsuario(oauthService.userFromToken.id));
+    (async () => {
+      setLoading(true);
+
+      try {
+        await appDispatch(loadUsuario(oauthService.userFromToken.id));
+        setLoading(false);
+      } catch (err) {
+        setLoading(false);
+        setToast({
+          ...toast,
+          open: true,
+          msg: err.message,
+          severity: "error",
+        });
+      }
+    })();
   }, []);
 
   useEffect(() => {
-    setBase64(usuario?.dadosPessoais.foto)
+    setBase64(usuario?.dadosPessoais.foto);
   }, [usuario]);
 
   const schema = yup.object({
@@ -90,7 +114,8 @@ export const Profile = () => {
   };
 
   const handleSubmit = async (values: any) => {
-    console.log("values", values);
+    setLoading(true);
+
     const usuarioToUpdate = {
       id: usuario.id,
       email: values.email,
@@ -101,11 +126,29 @@ export const Profile = () => {
         dtNascimento: values.dtNascimento,
       } as DadosPessoais,
     } as Usuario;
-    
-    await usuarioService.uploadFoto(usuario.id, file);
-    dispatch(updateUsuario(usuarioToUpdate));
-    
-    setIsEditing(false);
+
+    try {
+      await usuarioService.uploadFoto(usuario.id, file);
+      await appDispatch(updateUsuario(usuarioToUpdate));
+
+      setIsEditing(false);
+      setLoading(false);
+
+      setToast({
+        ...toast,
+        open: true,
+        msg: Messages.MSG008,
+        severity: "success",
+      });
+    } catch (err) {
+      setLoading(false);
+      setToast({
+        ...toast,
+        open: true,
+        msg: err.message,
+        severity: "error",
+      });
+    }
   };
 
   const formik = useFormik({
@@ -118,9 +161,8 @@ export const Profile = () => {
   const handleFile = async (event) => {
     const { files } = event.target;
     setFile(files[0]);
-    const base64 = await toBase64(files[0]) as string;
+    const base64 = (await toBase64(files[0])) as string;
     setBase64(base64);
-
   };
 
   const editar = (
@@ -156,6 +198,15 @@ export const Profile = () => {
 
   return (
     <div style={{ marginTop: 100 }}>
+      {loading && <Spinner size={50} />}
+      <Toast
+        open={toast.open}
+        duration={3000}
+        position={{ vertical: "top", horizontal: "right" }}
+        severity={toast.severity}
+        message={toast.msg}
+        handleClose={() => setToast({ ...toast, open: false })}
+      />
       <Navbar />
       <Grid container justifyContent="center">
         <Card className={classes.card}>

@@ -1,12 +1,10 @@
 import { AxiosResponse } from "axios";
-import { httpClient } from "../config/http/http-client";
 import { Avisos } from "../model/avisos.model";
 import { Conversa } from "../model/conversa.model";
 import { Usuario } from "../model/usuario.model";
+import { HttpBaseService } from "./http-base.service";
 
-export class UsuarioService {
-  private httpClient = httpClient;
-
+export class UsuarioService extends HttpBaseService {
   private readonly BASE_PATH = "usuario";
 
   cadastrar(usuario: Usuario, headers) {
@@ -57,8 +55,7 @@ export class UsuarioService {
     );
   }
 
-  uploadFoto(id: number, file): Promise<AxiosResponse<Usuario>>  {
-
+  uploadFoto(id: number, file): Promise<AxiosResponse<Usuario>> {
     const formData = new FormData();
 
     formData.append("arquivo", file);

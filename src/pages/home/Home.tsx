@@ -5,13 +5,14 @@ import {
   Grid,
   makeStyles,
   Theme,
-  Typography
+  Typography,
 } from "@material-ui/core";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { rxStomp } from "../../config/ws/rx-stomp";
 import { Conversa } from "../../model/conversa.model";
 import { Mensagem } from "../../model/mensagem.model";
+import { useAppDispatch } from "../../redux";
 import { loadAvisos } from "../../redux/slices/avisos/avisosSlice";
 import {
   cleanBadge,
@@ -21,12 +22,12 @@ import {
   loadConversas,
   novaConversa,
   novaMensagem,
-  selectConversa
+  selectConversa,
 } from "../../redux/slices/conversas/conversasSlice";
 import {
   loadUsuario,
   usuarioSelector,
-  UsuarioState
+  UsuarioState,
 } from "../../redux/slices/usuario/usuarioSlice";
 import { OauthService } from "../../service/oauth.service";
 import { Chat } from "../../shared/components/Chat";
@@ -35,6 +36,7 @@ import Navbar from "../../shared/components/Navbar";
 import { NoChatSelected } from "../../shared/components/NoChatSelected";
 import { ProfilePicture } from "../../shared/components/ProfilePicture";
 import { Spinner } from "../../shared/components/Spinner";
+import Toast from "../../shared/components/Toast";
 
 const drawerWidth = 300;
 
@@ -51,7 +53,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     drawer: {
       width: drawerWidth,
-      flexShrink: 0
+      flexShrink: 0,
     },
     drawerPaper: {
       width: drawerWidth,
@@ -78,21 +80,41 @@ function Home() {
   const classes = useStyles();
   const oauthService = new OauthService();
   const dispatch = useDispatch();
+  const appDispatch = useAppDispatch;
 
   const [loading, setLoading] = useState<boolean>(true);
+  const [toast, setToast] = useState({
+    open: false,
+    msg: "",
+    severity: "success",
+  });
 
   const { usuario } = useSelector(usuarioSelector) as UsuarioState;
   const { conversas } = useSelector(conversasSelector) as ConversasState;
   const { conversaAtual } = useSelector(conversasSelector) as ConversasState;
 
   useEffect(() => {
-    setTimeout(() => setLoading(false), 2000);
+    (async () => {
 
-    const idUsuario = oauthService.userFromToken.id;
+      setLoading(true);
+      const idUsuario = oauthService.userFromToken.id;
 
-    dispatch(loadConversas(idUsuario));
-    dispatch(loadAvisos(idUsuario));
-    dispatch(loadUsuario(idUsuario));
+      try {
+        await appDispatch(loadConversas(idUsuario));
+        await appDispatch(loadAvisos(idUsuario));
+        await appDispatch(loadUsuario(idUsuario));
+
+        setLoading(false);
+      } catch (err) {
+        setLoading(false);
+        setToast({
+          ...toast,
+          open: true,
+          msg: err.message,
+          severity: "error",
+        });
+      }
+    })();
   }, []);
 
   const rxStompWS = rxStomp;
@@ -101,7 +123,6 @@ function Home() {
 
   useEffect(() => {
     if (!isAlreadyRegistered) {
-      
       //subscribe to new Messages
       rxStompWS
         .watch("/topic/chat." + usuario?.dadosPessoais?.username)
@@ -146,8 +167,10 @@ function Home() {
   };
 
   const getFoto = () => {
-    return usuario && usuario.dadosPessoais.foto ? usuario.dadosPessoais.foto : ""
-  }
+    return usuario && usuario.dadosPessoais.foto
+      ? usuario.dadosPessoais.foto
+      : "";
+  };
 
   const Contatos = () => (
     <div className={classes.contacts}>
@@ -166,6 +189,14 @@ function Home() {
   return (
     <div className={classes.root}>
       {loading && <Spinner size={50} />}
+      <Toast
+        open={toast.open}
+        duration={3000}
+        position={{ vertical: "top", horizontal: "right" }}
+        severity={toast.severity}
+        message={toast.msg}
+        handleClose={() => setToast({ ...toast, open: false })}
+      />
       <CssBaseline />
       <Navbar />
       <Drawer
@@ -178,7 +209,9 @@ function Home() {
       >
         <ProfilePicture base64={getFoto()} />
         <Grid container justifyContent="center">
-          <Typography variant="body1">{usuario?.dadosPessoais?.nome}</Typography>
+          <Typography variant="body1">
+            {usuario?.dadosPessoais?.nome}
+          </Typography>
         </Grid>
         <Contatos />
       </Drawer>

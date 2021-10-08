@@ -27,4 +27,5 @@ const store = configureStore({
   devTools: !enviroment.production
 });
 
+export const useAppDispatch = store.dispatch;
 export default store;

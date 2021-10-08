@@ -1,10 +1,15 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { Usuario } from "../../../model/usuario.model";
 import { UsuarioService } from "../../../service/usuario.service";
 import { USUARIO_SLICE } from "../../constants/contants";
 
 const usuarioService = new UsuarioService();
 
+export const updateUser = createAsyncThunk(USUARIO_SLICE + "/updateUser", async (id: number) => {
+  const { data } = await usuarioService.findById(id);
+
+  return data;
+})
 export interface UsuarioState {
   usuario: Usuario;
   loading: boolean;
@@ -34,6 +39,12 @@ const usuarioSlice = createSlice({
       state.error = true;
     },
   },
+
+  extraReducers: (builder) => {
+    builder.addCase(updateUser.fulfilled, (state, action) => {
+      
+    })
+  }
 });
 
 export const loadUsuario = (id: number) => async (dispatch) => {
