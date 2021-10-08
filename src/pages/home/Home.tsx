@@ -123,6 +123,8 @@ function Home() {
 
   useEffect(() => {
     if (!isAlreadyRegistered) {
+
+      rxStompWS.activate();
       //subscribe to new Messages
       rxStompWS
         .watch("/topic/chat." + usuario?.dadosPessoais?.username)

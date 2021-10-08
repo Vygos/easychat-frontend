@@ -11,7 +11,7 @@ import { Profile } from "./pages/profile/Profile";
 const App = () => {
   return (
     <div className="app">
-      <BrowserRouter forceRefresh>
+      <BrowserRouter>
         <Switch>
           <Route path="/login" exact component={Login} />
           <Route path="/signin" exact component={SignUp} />

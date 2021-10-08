@@ -13,6 +13,9 @@ import { makeStyles } from "@material-ui/styles";
 import { useState } from "react";
 import { useHistory } from "react-router";
 import { Link } from "react-router-dom";
+import { rxStomp } from "../../config/ws/rx-stomp";
+import { useAppDispatch } from "../../redux";
+import { logout } from "../../redux/slices/usuario/usuarioSlice";
 import { OauthService } from "../../service/oauth.service";
 import { AvisosNotification } from "./AvisosNotification";
 
@@ -32,6 +35,7 @@ export const EndNavbar = () => {
   const [anchorElAccount, setAnchorElAccount] = useState<HTMLElement>(null);
 
   const history = useHistory();
+  const appDispatch = useAppDispatch;
 
   const isMenuOpenAccount = Boolean(anchorElAccount);
 
@@ -45,7 +49,11 @@ export const EndNavbar = () => {
 
   const handleLogout = () => {
     oauthService.removeToken();
+    appDispatch(logout())
     history.push("/login");
+    if (rxStomp.connected()) {
+      rxStomp.deactivate();
+    }
   };
 
   const MenuAccount = () => (

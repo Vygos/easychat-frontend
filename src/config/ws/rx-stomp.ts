@@ -14,6 +14,5 @@ rxStomp.configure({
     console.log(new Date(), msg);
   },
 });
-rxStomp.activate();
 
 export { rxStomp };

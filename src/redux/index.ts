@@ -4,6 +4,7 @@ import {
   getDefaultMiddleware,
 } from "@reduxjs/toolkit";
 import { enviroment } from "../env/easychat.env";
+import { USUARIO_SLICE } from "./constants/contants";
 import avisosSlice, { AvisosState } from "./slices/avisos/avisosSlice";
 import conversaSlice, {
   ConversasState,
@@ -16,14 +17,23 @@ export interface Root {
   avisosInfo: AvisosState;
 }
 
-const reducers = combineReducers<Root>({
+const appReducer = combineReducers<Root>({
   usuarioInfo: usuarioSlice,
   conversasInfo: conversaSlice,
   avisosInfo: avisosSlice,
 });
 
+const rootReducer = (state, action) => {
+  if (action.type === USUARIO_SLICE + "/logout") {
+    return appReducer(undefined, action)
+  }
+
+  return appReducer(state, action)
+}
+
+
 const store = configureStore({
-  reducer: reducers,
+  reducer: rootReducer,
   devTools: !enviroment.production
 });
 

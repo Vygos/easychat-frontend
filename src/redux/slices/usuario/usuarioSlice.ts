@@ -5,11 +5,14 @@ import { USUARIO_SLICE } from "../../constants/contants";
 
 const usuarioService = new UsuarioService();
 
-export const updateUser = createAsyncThunk(USUARIO_SLICE + "/updateUser", async (id: number) => {
-  const { data } = await usuarioService.findById(id);
+export const updateUser = createAsyncThunk(
+  USUARIO_SLICE + "/updateUser",
+  async (id: number) => {
+    const { data } = await usuarioService.findById(id);
 
-  return data;
-})
+    return data;
+  }
+);
 export interface UsuarioState {
   usuario: Usuario;
   loading: boolean;
@@ -35,41 +38,24 @@ const usuarioSlice = createSlice({
       state.loading = action.payload;
     },
 
-    errorLoadingUsuario: (state) => {
-      state.error = true;
-    },
+    logout: (state) => {},
   },
-
-  extraReducers: (builder) => {
-    builder.addCase(updateUser.fulfilled, (state, action) => {
-      
-    })
-  }
 });
 
 export const loadUsuario = (id: number) => async (dispatch) => {
-  try {
-    const { data } = await usuarioService.findById(id);
-    dispatch(assignUsuario(data));
-  } catch (e) {
-    dispatch(errorLoadingUsuario());
-  }
+  const { data } = await usuarioService.findById(id);
+  dispatch(assignUsuario(data));
 };
 
 export const updateUsuario = (usuario: Usuario) => async (dispatch) => {
-  try {
-    const { data } = await usuarioService.atualizar(usuario);
-    dispatch(assignUsuario(data));
-  } catch (e) {
-    dispatch(errorLoadingUsuario());
-  }
+  const { data } = await usuarioService.atualizar(usuario);
+  dispatch(assignUsuario(data));
 };
 
 // ====== SELECTORS ===========
 
 export const usuarioSelector = (state: any) => state.usuarioInfo;
 
-export const { assignUsuario, initLoadingUsuario, errorLoadingUsuario } =
-  usuarioSlice.actions;
+export const { assignUsuario, initLoadingUsuario, logout } = usuarioSlice.actions;
 
 export default usuarioSlice.reducer;

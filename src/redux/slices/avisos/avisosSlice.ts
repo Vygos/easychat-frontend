@@ -47,21 +47,13 @@ const avisosSlice = createSlice({
 });
 
 export const deletarAviso = (aviso: Avisos) => async (dispatch) => {
-  try {
-    await avisosService.delete(aviso.id);
-    dispatch(deleteAviso(aviso));
-  } catch (error) {
-    console.log("error", error);
-  }
+  await avisosService.delete(aviso.id);
+  dispatch(deleteAviso(aviso));
 };
 
 export const loadAvisos = (id: number) => async (dispatch) => {
-  try {
-    const { data } = await usuarioService.listAllAvisos(id);
-    dispatch(assignAvisos(data));
-  } catch (e) {
-    console.log("error", e);
-  }
+  const { data } = await usuarioService.listAllAvisos(id);
+  dispatch(assignAvisos(data));
 };
 
 // ====== SELECTORS ===========

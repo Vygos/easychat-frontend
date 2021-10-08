@@ -103,11 +103,8 @@ const conversasSlice = createSlice({
 
 export const loadConversas = (id: number) => async (dispatch) => {
   const { data } = await usuarioService.listAllConversas(id);
-  try {
-    dispatch(assignConversas(data));
-  } catch (e) {
-    console.log("error", e);
-  }
+
+  dispatch(assignConversas(data));
 };
 
 // ====== SELECTORS ===========
@@ -123,7 +120,7 @@ export const {
   novaMensagem,
   novaConversa,
   incrementaBadge,
-  cleanBadge
+  cleanBadge,
 } = conversasSlice.actions;
 
 export default conversasSlice.reducer;
