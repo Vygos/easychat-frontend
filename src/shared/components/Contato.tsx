@@ -35,6 +35,8 @@ export const Contato = ({
 }) => {
   const classes = useStyles();
 
+  const [usuario] = conversa.usuarios;
+
   return (
     <>
       <ListItem
@@ -44,13 +46,11 @@ export const Contato = ({
         <ListItemIcon>
           <Avatar className={classes.size}>
             <Typography variant="caption">
-              {conversa.usuarios[0].dadosPessoais?.nome
-                ?.toUpperCase()
-                .substring(0, 2)}
+              {usuario?.dadosPessoais?.nome?.toUpperCase().substring(0, 2)}
             </Typography>
           </Avatar>
         </ListItemIcon>
-        <ListItemText primary={conversa.usuarios[0].dadosPessoais?.nome} />
+        <ListItemText primary={usuario.dadosPessoais?.nome} />
         <Badge color="primary" badgeContent={conversa.badge}></Badge>
       </ListItem>
       <Divider />
