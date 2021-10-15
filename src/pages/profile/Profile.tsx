@@ -1,13 +1,4 @@
-import {
-  Button,
-  Card,
-  CardContent,
-  Grid,
-  IconButton,
-  Theme,
-  Typography,
-} from "@material-ui/core";
-import { PhotoCamera } from "@material-ui/icons";
+import { Card, CardContent, Grid, Theme } from "@material-ui/core";
 import { makeStyles } from "@material-ui/styles";
 import { useFormik } from "formik";
 import moment from "moment";
@@ -25,13 +16,12 @@ import {
 } from "../../redux/slices/usuario/usuarioSlice";
 import { OauthService } from "../../service/oauth.service";
 import { UsuarioService } from "../../service/usuario.service";
-import Input from "../../shared/components/Input";
 import Navbar from "../../shared/components/Navbar";
-import { ProfilePicture } from "../../shared/components/ProfilePicture";
 import { Spinner } from "../../shared/components/Spinner";
 import Toast from "../../shared/components/Toast";
 import { Messages } from "../../shared/messages/validation-messages";
 import { toBase64 } from "../../shared/utils/fileToBase64";
+import { FormProfile } from "./FormProfile";
 
 const useStyles = makeStyles((theme: Theme) => ({
   card: {
@@ -42,10 +32,6 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   input: {
     width: theme.spacing(40),
-  },
-
-  btnCancelar: {
-    // color: '#ff2a00'
   },
 }));
 
@@ -66,6 +52,20 @@ export const Profile = () => {
   });
 
   const { usuario } = useSelector(usuarioSelector) as UsuarioState;
+
+  const initialValues = {
+    id: usuario ? usuario.id : "",
+    nome: usuario ? usuario.dadosPessoais.nome : "",
+    username: usuario ? usuario.dadosPessoais.username : "",
+    email: usuario ? usuario.email : "",
+    dtNascimento:
+      usuario && usuario.dadosPessoais.dtNascimento
+        ? moment(usuario.dadosPessoais.dtNascimento).format("YYYY-MM-DD")
+        : "",
+    dtCadastro: usuario
+      ? moment(usuario.dadosPessoais.dtCadastro).format("YYYY-MM-DD")
+      : "",
+  };
 
   useEffect(() => {
     (async () => {
@@ -89,29 +89,6 @@ export const Profile = () => {
   useEffect(() => {
     setBase64(usuario?.dadosPessoais.foto);
   }, [usuario]);
-
-  const schema = yup.object({
-    id: yup.number(),
-    nome: yup.string().required(Messages.MSG001),
-    username: yup.string().required(Messages.MSG001),
-    email: yup.string(),
-    dtNascimento: yup.date(),
-    dtCadastro: yup.date(),
-  });
-
-  const initialValues = {
-    id: usuario ? usuario.id : "",
-    nome: usuario ? usuario.dadosPessoais.nome : "",
-    username: usuario ? usuario.dadosPessoais.username : "",
-    email: usuario ? usuario.email : "",
-    dtNascimento:
-      usuario && usuario.dadosPessoais.dtNascimento
-        ? moment(usuario.dadosPessoais.dtNascimento).format("YYYY-MM-DD")
-        : "",
-    dtCadastro: usuario
-      ? moment(usuario.dadosPessoais.dtCadastro).format("YYYY-MM-DD")
-      : "",
-  };
 
   const handleSubmit = async (values: any) => {
     setLoading(true);
@@ -151,6 +128,15 @@ export const Profile = () => {
     }
   };
 
+  const schema = yup.object({
+    id: yup.number(),
+    nome: yup.string().required(Messages.MSG001),
+    username: yup.string().required(Messages.MSG001),
+    email: yup.string(),
+    dtNascimento: yup.date(),
+    dtCadastro: yup.date(),
+  });
+
   const formik = useFormik({
     initialValues,
     validationSchema: schema,
@@ -165,36 +151,15 @@ export const Profile = () => {
     setBase64(base64);
   };
 
-  const editar = (
-    <Button
-      variant="contained"
-      color="primary"
-      onClick={() => setIsEditing(true)}
-    >
-      Editar
-    </Button>
-  );
+  const editar = (e) => {
+    e.preventDefault();
+    setIsEditing(true);
+  }
 
-  const salvar = (
-    <Button type="submit" variant="contained" color="primary">
-      Salvar
-    </Button>
-  );
-
-  const cancelar = (
-    <Button
-      className={classes.btnCancelar}
-      type="submit"
-      variant="outlined"
-      color="primary"
-      onClick={() => {
-        setIsEditing(false);
-        formik.setValues(initialValues);
-      }}
-    >
-      Cancelar
-    </Button>
-  );
+  const cancelar = () => {
+    setIsEditing(false);
+    formik.setValues(initialValues);
+  };
 
   return (
     <div style={{ marginTop: 100 }}>
@@ -207,139 +172,23 @@ export const Profile = () => {
         message={toast.msg}
         handleClose={() => setToast({ ...toast, open: false })}
       />
+
       <Navbar />
+
       <Grid container justifyContent="center">
         <Card className={classes.card}>
           <CardContent>
-            <form onSubmit={formik.handleSubmit}>
-              <Grid
-                container
-                direction="row"
-                alignContent="space-around"
-                spacing={6}
-              >
-                <Grid item xs={12}>
-                  <Typography variant="h5">DADOS PESSOAIS</Typography>
-                </Grid>
-                <Grid item xs={12}>
-                  <ProfilePicture base64={base64} />
-                  <input
-                    accept="image/*"
-                    className={classes.inputFile}
-                    id="btn-file"
-                    type="file"
-                    onChange={handleFile}
-                  />
-                  <label htmlFor="btn-file">
-                    <IconButton
-                      color="primary"
-                      aria-label="upload picture"
-                      component="span"
-                      disabled={!isEditing}
-                    >
-                      <PhotoCamera />
-                    </IconButton>
-                  </label>
-                </Grid>
-                <Grid item xs={6}>
-                  <Input
-                    className={classes.input}
-                    id="nome"
-                    label="Nome"
-                    variant="outlined"
-                    value={formik.values.nome}
-                    error={formik.touched.nome && Boolean(formik.errors.nome)}
-                    helperText={formik.touched.nome && formik.errors.nome}
-                    onChange={formik.handleChange}
-                    formik={formik}
-                    disabled={!isEditing}
-                  />
-                </Grid>
-                <Grid item xs={6}>
-                  <Input
-                    className={classes.input}
-                    id="username"
-                    label="Username"
-                    variant="outlined"
-                    value={formik.values.username}
-                    error={
-                      formik.touched.username && Boolean(formik.errors.username)
-                    }
-                    helperText={
-                      formik.touched.username && formik.errors.username
-                    }
-                    onChange={formik.handleChange}
-                    formik={formik}
-                    disabled={true}
-                  />
-                </Grid>
-                <Grid item xs={6}>
-                  <Input
-                    className={classes.input}
-                    id="email"
-                    label="email"
-                    variant="outlined"
-                    value={formik.values.email}
-                    error={formik.touched.email && Boolean(formik.errors.email)}
-                    helperText={formik.touched.email && formik.errors.email}
-                    onChange={formik.handleChange}
-                    formik={formik}
-                    disabled={true}
-                  />
-                </Grid>
-                <Grid item xs={6}>
-                  <Input
-                    className={classes.input}
-                    id="dtNascimento"
-                    type="date"
-                    label="Data de Nascimento"
-                    variant="outlined"
-                    value={formik.values.dtNascimento}
-                    InputLabelProps={{ shrink: true }}
-                    error={
-                      formik.touched.dtNascimento &&
-                      Boolean(formik.errors.dtNascimento)
-                    }
-                    helperText={
-                      formik.touched.dtNascimento && formik.errors.dtNascimento
-                    }
-                    onChange={formik.handleChange}
-                    formik={formik}
-                    disabled={!isEditing}
-                  />
-                </Grid>
-                <Grid item xs={6}>
-                  <Input
-                    className={classes.input}
-                    id="dataCadastro"
-                    type="date"
-                    label="Data de Cadastro"
-                    variant="outlined"
-                    value={formik.values.dtCadastro}
-                    InputLabelProps={{ shrink: true }}
-                    error={
-                      formik.touched.dataCadastro &&
-                      Boolean(formik.errors.dtCadastro)
-                    }
-                    helperText={
-                      formik.touched.dtCadastro && formik.errors.dtCadastro
-                    }
-                    onChange={formik.handleChange}
-                    formik={formik}
-                    disabled={true}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  {!isEditing ? (
-                    editar
-                  ) : (
-                    <div>
-                      {salvar} {cancelar}
-                    </div>
-                  )}
-                </Grid>
-              </Grid>
-            </form>
+            <FormProfile
+              formik={formik}
+              handleFile={handleFile}
+              editar={editar}
+              salvar={formik.handleSubmit}
+              cancelar={cancelar}
+              isEditing={isEditing}
+              usuario={usuario}
+              file={file}
+              base64={base64}
+            />
           </CardContent>
         </Card>
       </Grid>
