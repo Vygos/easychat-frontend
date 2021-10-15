@@ -119,14 +119,13 @@ function Home() {
 
   const rxStompWS = rxStomp;
 
-  let isAlreadyRegistered = false;
-
   useEffect(() => {
-    if (!isAlreadyRegistered) {
+    const { chatState, conversasState} = rxStompWS;
 
-      rxStompWS.activate();
+    if (usuario && !chatState && !conversasState) {
       //subscribe to new Messages
       rxStompWS
+        .stomp
         .watch("/topic/chat." + usuario?.dadosPessoais?.username)
         .subscribe(({ body }) => {
           let newMensagem = JSON.parse(body) as Mensagem;
@@ -137,6 +136,7 @@ function Home() {
 
       //subscribe to new conversations
       rxStompWS
+        .stomp
         .watch("/topic/conversa." + usuario?.dadosPessoais?.username)
         .subscribe(({ body }) => {
           let newConversa = JSON.parse(body) as Conversa;
@@ -149,8 +149,9 @@ function Home() {
           dispatch(novaConversa(payload));
           beepNotification();
         });
-
-      isAlreadyRegistered = true;
+      
+      rxStompWS.chatState = true
+      rxStompWS.conversasState = true;
     }
   }, [usuario]);
 

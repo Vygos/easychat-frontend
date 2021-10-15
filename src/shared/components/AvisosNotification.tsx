@@ -61,13 +61,15 @@ export const AvisosNotification = () => {
     : avisos;
 
   useEffect(() => {
-    if (usuario) {
+    if (usuario && !rxStomp.avisosState) {
       rxStomp
+        .stomp
         .watch("/topic/avisos." + usuario.dadosPessoais.username)
         .subscribe((message) => {
           const newAviso = JSON.parse(message.body);
           dispatch(novoAviso(newAviso));
         });
+        rxStomp.avisosState = true
     }
   }, [usuario]);
 

@@ -51,8 +51,8 @@ export const EndNavbar = () => {
     oauthService.removeToken();
     appDispatch(logout())
     history.push("/login");
-    if (rxStomp.connected()) {
-      rxStomp.deactivate();
+    if (rxStomp.stomp.connected()) {
+      rxStomp.stomp.deactivate();
     }
   };
 

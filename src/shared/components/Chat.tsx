@@ -93,7 +93,7 @@ export const Chat = ({
 
     dispatch(novaMensagem(mensagem));
 
-    rxStompWS.publish({
+    rxStompWS.stomp.publish({
       body: JSON.stringify(mensagem),
       destination:
         "/app/chat." + conversaAtual?.usuarios[0].dadosPessoais?.username,
