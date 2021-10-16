@@ -30,6 +30,7 @@ import {
 } from "../../redux/slices/usuario/usuarioSlice";
 import { OauthService } from "../../service/oauth.service";
 import { UsuarioService } from "../../service/usuario.service";
+import { PedidoAmizadeAviso } from "./PedidoAmizadeAviso";
 
 const useStyles = makeStyles((theme: Theme) => ({
   avatar: {
@@ -38,8 +39,8 @@ const useStyles = makeStyles((theme: Theme) => ({
     height: theme.spacing(4),
   },
   root: {
-    marginTop: theme.spacing(0.5)
-  }
+    marginTop: theme.spacing(0.5),
+  },
 }));
 
 export const AvisosNotification = () => {
@@ -62,14 +63,13 @@ export const AvisosNotification = () => {
 
   useEffect(() => {
     if (usuario && !rxStomp.avisosState) {
-      rxStomp
-        .stomp
+      rxStomp.stomp
         .watch("/topic/avisos." + usuario.dadosPessoais.username)
         .subscribe((message) => {
           const newAviso = JSON.parse(message.body);
           dispatch(novoAviso(newAviso));
         });
-        rxStomp.avisosState = true
+      rxStomp.avisosState = true;
     }
   }, [usuario]);
 
@@ -106,42 +106,17 @@ export const AvisosNotification = () => {
           avisos.map((aviso) => {
             return (
               aviso.tipo == TipoAviso.PEDIDO_AMIZADE && (
-                <PedidoAmizade key={aviso.id} aviso={aviso} />
+                <PedidoAmizadeAviso
+                  key={aviso.id}
+                  aviso={aviso}
+                  handleMenuCloseAvisos={handleMenuCloseAvisos}
+                />
               )
             );
           })}
       </>
     );
   });
-
-  const PedidoAmizade = ({ aviso }: { aviso: Avisos }) => {
-    return (
-      <MenuItem>
-        <Grid container spacing={2}>
-          <Grid item xs={2}>
-            <Avatar className={classes.avatar}>
-              <Typography variant="caption">
-                {aviso.contato.dadosPessoais.nome.toUpperCase().substring(0, 2)}
-              </Typography>
-            </Avatar>
-          </Grid>
-          <Grid item xs={6}>
-            <Typography variant="caption">
-              {aviso.contato.dadosPessoais.username} {aviso.descricao}
-            </Typography>
-          </Grid>
-        </Grid>
-        <Grid container justifyContent="flex-end">
-          <IconButton
-            style={{ color: "#0ced13" }}
-            onClick={() => handleMenuCloseAvisos(aviso)}
-          >
-            <CheckCircleOutline color="inherit" />
-          </IconButton>
-        </Grid>
-      </MenuItem>
-    );
-  };
 
   return (
     <Grid className={classes.root}>

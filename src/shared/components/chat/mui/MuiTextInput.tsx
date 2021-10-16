@@ -7,9 +7,10 @@ import {
   Theme,
 } from "@material-ui/core";
 import { EmojiEmotionsOutlined, Send as SendIcon } from "@material-ui/icons";
-import React, { useRef, useState } from "react";
+import EmojiPicker, { IEmojiData } from "emoji-picker-react";
+import React, { useCallback, useRef, useState } from "react";
 import { MessageSent } from "../mui/chat-types";
-import { EmojiPicker } from "./EmojiPicker";
+import { MenuEmojiPicker } from "./MenuEmojiPicker";
 
 const useStyles = makeStyles((theme: Theme) => ({
   container: {
@@ -40,9 +41,17 @@ export function MuiTextInput({
   scroll: () => void;
 }): React.ReactElement {
   const classes = useStyles();
+
   const [value, setValue] = useState<string>("");
   const [anchorEl, setAnchorEl] = useState<HTMLElement>(null);
   const ref = useRef(null);
+
+  const setValueCb = useCallback(
+    (e) => {
+      setValue(e);
+    },
+    [value]
+  );
 
   const isMenuOpen = Boolean(anchorEl);
 
@@ -75,6 +84,12 @@ export function MuiTextInput({
     }, 500);
   };
 
+  const handleEmojiClick = (event, data: IEmojiData) => {
+    const { emoji } = data;
+
+    setValue(value + emoji);
+  };
+
   const sendButtonText = "Enviar";
 
   return (
@@ -83,7 +98,7 @@ export function MuiTextInput({
         ref={ref}
         placeholder="Digite uma mensagem"
         value={value}
-        onChange={(e): void => setValue(e.target.value)}
+        onChange={(e): void => setValueCb(e.target.value)}
         autoFocus
         multiline
         inputProps={{ onKeyDown: handleKeyDown }}
@@ -110,6 +125,12 @@ export function MuiTextInput({
       >
         {sendButtonText}
       </Button>
+      <MenuEmojiPicker
+        anchorEl={anchorEl}
+        isMenuOpen={isMenuOpen}
+        handleMenuClose={handleMenuClose}
+        handleEmojiClick={handleEmojiClick}
+      />
     </div>
   );
 }
