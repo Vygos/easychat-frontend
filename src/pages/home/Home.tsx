@@ -201,7 +201,7 @@ function Home() {
         handleClose={() => setToast({ ...toast, open: false })}
       />
       <CssBaseline />
-      <Navbar />
+      <Navbar extensible />
       <Drawer
         className={classes.drawer}
         variant="permanent"

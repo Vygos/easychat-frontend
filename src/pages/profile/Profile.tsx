@@ -43,7 +43,7 @@ export const Profile = () => {
 
   const [loading, setLoading] = useState<boolean>(false);
   const [isEditing, setIsEditing] = useState<boolean>(null);
-  const [file, setFile] = useState<string>("");
+  const [file, setFile] = useState<any>(null);
   const [base64, setBase64] = useState<string>(null);
   const [toast, setToast] = useState({
     open: false,
@@ -105,7 +105,7 @@ export const Profile = () => {
     } as Usuario;
 
     try {
-      await usuarioService.uploadFoto(usuario.id, file);
+      await uploadFoto(usuario.id, file);
       await appDispatch(updateUsuario(usuarioToUpdate));
 
       setIsEditing(false);
@@ -159,7 +159,20 @@ export const Profile = () => {
   const cancelar = () => {
     setIsEditing(false);
     formik.setValues(initialValues);
+
+    //cancelFoto
+
+    setBase64(usuario.dadosPessoais.foto);
+    setFile(null);
   };
+
+  const uploadFoto = async (id: number, file: any) => {
+    if (!file) {
+      return;
+    }
+
+    await usuarioService.uploadFoto(usuario.id, file)
+  }
 
   return (
     <div style={{ marginTop: 100 }}>
@@ -186,7 +199,6 @@ export const Profile = () => {
               cancelar={cancelar}
               isEditing={isEditing}
               usuario={usuario}
-              file={file}
               base64={base64}
             />
           </CardContent>

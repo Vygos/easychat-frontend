@@ -50,16 +50,19 @@ const useStyles = makeStyles((theme: Theme) =>
         duration: theme.transitions.duration.enteringScreen,
       }),
     },
+    appBarNoShift: {
+      marginLeft: 0,
+    },
     sectionDesktop: {
       display: "none",
       [theme.breakpoints.up("md")]: {
         display: "flex",
       },
-    }
+    },
   })
 );
 
-const Navbar = () => {
+const Navbar = ({ extensible }: { extensible?: true }) => {
   const classes = useStyles();
   const oauthService = new OauthService();
   const usuarioService = new UsuarioService();
@@ -95,7 +98,11 @@ const Navbar = () => {
       />
       <AppBar
         position="fixed"
-        className={clsx(classes.appBar, classes.appBarShift)}
+        className={
+          extensible
+            ? clsx(classes.appBar, classes.appBarShift)
+            : classes.appBarNoShift
+        }
       >
         <Toolbar>
           <Grid container direction="row" alignItems="center" spacing={2}>

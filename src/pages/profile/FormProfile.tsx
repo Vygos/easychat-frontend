@@ -32,7 +32,6 @@ interface FormProfileProps {
   cancelar: () => void;
   isEditing: boolean;
   base64: string;
-  file: string;
 }
 
 export const FormProfile = ({
