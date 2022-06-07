@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import _ from "lodash";
+import { Root } from "../..";
 import { Conversa } from "../../../model/conversa.model";
 import { Mensagem } from "../../../model/mensagem.model";
 import { UsuarioService } from "../../../service/usuario.service";
@@ -49,12 +50,9 @@ const conversasSlice = createSlice({
       }
 
       const predicate = (conversa) => conversa.id === novaMensagem.conversa.id;
-
-      const conversaToUpdate = state.conversas.find(predicate);
-      conversaToUpdate.mensagens.push(novaMensagem);
       const index = state.conversas.findIndex(predicate);
 
-      state.conversas[index] = conversaToUpdate;
+      state.conversas[index]?.mensagens.push(novaMensagem);
     },
 
     novaConversa(state, action) {
@@ -109,8 +107,8 @@ export const loadConversas = (id: number) => async (dispatch) => {
 
 // ====== SELECTORS ===========
 
-export const conversasSelector = (state: any) => state.conversasInfo;
-export const conversaSelector = (state: any) =>
+export const conversasSelector = (state: Root) => state.conversasInfo;
+export const conversaSelector = (state: Root) =>
   state.conversasInfo.conversaAtual;
 
 export const {

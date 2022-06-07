@@ -1,10 +1,8 @@
 import { Card, CardContent, Grid, Theme } from "@material-ui/core";
 import { makeStyles } from "@material-ui/styles";
 import { useFormik } from "formik";
-import moment from "moment";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import * as yup from "yup";
 import { DadosPessoais } from "../../model/dados-pessoais.model";
 import { Usuario } from "../../model/usuario.model";
 import { useAppDispatch } from "../../redux";
@@ -12,7 +10,7 @@ import {
   loadUsuario,
   updateUsuario,
   usuarioSelector,
-  UsuarioState,
+  UsuarioState
 } from "../../redux/slices/usuario/usuarioSlice";
 import { OauthService } from "../../service/oauth.service";
 import { UsuarioService } from "../../service/usuario.service";
@@ -22,21 +20,11 @@ import Toast from "../../shared/components/Toast";
 import { Messages } from "../../shared/messages/validation-messages";
 import { toBase64 } from "../../shared/utils/fileToBase64";
 import { FormProfile } from "./FormProfile";
-
-const useStyles = makeStyles((theme: Theme) => ({
-  card: {
-    width: theme.spacing(110),
-  },
-  inputFile: {
-    display: "none",
-  },
-  input: {
-    width: theme.spacing(40),
-  },
-}));
+import { getProfileInitialState, getSchemaProfile } from "./form-state";
+import profileStyle from "./profile-style";
 
 export const Profile = () => {
-  const classes = useStyles();
+  const classes = profileStyle();
   const oauthService = new OauthService();
   const usuarioService = new UsuarioService();
   const appDispatch = useAppDispatch;
@@ -53,19 +41,7 @@ export const Profile = () => {
 
   const { usuario } = useSelector(usuarioSelector) as UsuarioState;
 
-  const initialValues = {
-    id: usuario ? usuario.id : "",
-    nome: usuario ? usuario.dadosPessoais.nome : "",
-    username: usuario ? usuario.dadosPessoais.username : "",
-    email: usuario ? usuario.email : "",
-    dtNascimento:
-      usuario && usuario.dadosPessoais.dtNascimento
-        ? moment(usuario.dadosPessoais.dtNascimento).format("YYYY-MM-DD")
-        : "",
-    dtCadastro: usuario
-      ? moment(usuario.dadosPessoais.dtCadastro).format("YYYY-MM-DD")
-      : "",
-  };
+  const initialValues = getProfileInitialState(usuario)
 
   useEffect(() => {
     (async () => {
@@ -128,18 +104,9 @@ export const Profile = () => {
     }
   };
 
-  const schema = yup.object({
-    id: yup.number(),
-    nome: yup.string().required(Messages.MSG001),
-    username: yup.string().required(Messages.MSG001),
-    email: yup.string(),
-    dtNascimento: yup.date(),
-    dtCadastro: yup.date(),
-  });
-
   const formik = useFormik({
     initialValues,
-    validationSchema: schema,
+    validationSchema: getSchemaProfile,
     onSubmit: handleSubmit,
     enableReinitialize: true,
   });

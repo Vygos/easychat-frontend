@@ -5,7 +5,7 @@ import {
   Grid,
   makeStyles,
   Theme,
-  Typography,
+  Typography
 } from "@material-ui/core";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -15,69 +15,31 @@ import { Mensagem } from "../../model/mensagem.model";
 import { useAppDispatch } from "../../redux";
 import { loadAvisos } from "../../redux/slices/avisos/avisosSlice";
 import {
-  cleanBadge,
   conversasSelector,
   ConversasState,
   incrementaBadge,
   loadConversas,
   novaConversa,
-  novaMensagem,
-  selectConversa,
+  novaMensagem
 } from "../../redux/slices/conversas/conversasSlice";
 import {
   loadUsuario,
   usuarioSelector,
-  UsuarioState,
+  UsuarioState
 } from "../../redux/slices/usuario/usuarioSlice";
 import { OauthService } from "../../service/oauth.service";
 import { Chat } from "../../shared/components/Chat";
-import { Contato } from "../../shared/components/Contato";
+import Contatos from "../../shared/components/Contatos";
 import Navbar from "../../shared/components/Navbar";
 import { NoChatSelected } from "../../shared/components/NoChatSelected";
 import { ProfilePicture } from "../../shared/components/ProfilePicture";
 import { Spinner } from "../../shared/components/Spinner";
 import Toast from "../../shared/components/Toast";
+import homeStyle from "./home-style";
 
-const drawerWidth = 300;
-
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    root: {
-      display: "flex",
-    },
-    menuButton: {
-      marginRight: theme.spacing(2),
-    },
-    hide: {
-      display: "none",
-    },
-    drawer: {
-      width: drawerWidth,
-      flexShrink: 0,
-    },
-    drawerPaper: {
-      width: drawerWidth,
-    },
-    drawerHeader: {
-      display: "flex",
-      alignItems: "center",
-      padding: theme.spacing(0, 1),
-      ...theme.mixins.toolbar,
-      justifyContent: "flex-end",
-    },
-    toolbar: theme.mixins.toolbar,
-    contacts: {
-      marginTop: "30px",
-    },
-    main: {
-      width: "100%",
-      height: "100%",
-    },
-  })
-);
 
 function Home() {
-  const classes = useStyles();
+  const classes = homeStyle();
   const oauthService = new OauthService();
   const dispatch = useDispatch();
   const appDispatch = useAppDispatch;
@@ -90,12 +52,10 @@ function Home() {
   });
 
   const { usuario } = useSelector(usuarioSelector) as UsuarioState;
-  const { conversas } = useSelector(conversasSelector) as ConversasState;
   const { conversaAtual } = useSelector(conversasSelector) as ConversasState;
 
   useEffect(() => {
     (async () => {
-
       setLoading(true);
       const idUsuario = oauthService.userFromToken.id;
 
@@ -120,12 +80,11 @@ function Home() {
   const rxStompWS = rxStomp;
 
   useEffect(() => {
-    const { chatState, conversasState} = rxStompWS;
+    const { chatState, conversasState } = rxStompWS;
 
     if (usuario && !chatState && !conversasState) {
       //subscribe to new Messages
-      rxStompWS
-        .stomp
+      rxStompWS.stomp
         .watch("/topic/chat." + usuario?.dadosPessoais?.username)
         .subscribe(({ body }) => {
           let newMensagem = JSON.parse(body) as Mensagem;
@@ -135,8 +94,7 @@ function Home() {
         });
 
       //subscribe to new conversations
-      rxStompWS
-        .stomp
+      rxStompWS.stomp
         .watch("/topic/conversa." + usuario?.dadosPessoais?.username)
         .subscribe(({ body }) => {
           let newConversa = JSON.parse(body) as Conversa;
@@ -149,8 +107,8 @@ function Home() {
           dispatch(novaConversa(payload));
           beepNotification();
         });
-      
-      rxStompWS.chatState = true
+
+      rxStompWS.chatState = true;
       rxStompWS.conversasState = true;
     }
   }, [usuario]);
@@ -164,30 +122,11 @@ function Home() {
     }
   };
 
-  const handleSelectConversa = (conversa: Conversa) => {
-    dispatch(selectConversa(conversa));
-    dispatch(cleanBadge(conversa));
-  };
-
   const getFoto = () => {
     return usuario && usuario.dadosPessoais.foto
       ? usuario.dadosPessoais.foto
       : "";
   };
-
-  const Contatos = () => (
-    <div className={classes.contacts}>
-      {conversas &&
-        conversas.map((conversa, index) => (
-          <div key={index} onClick={() => handleSelectConversa(conversa)}>
-            <Contato
-              conversa={conversa}
-              selected={conversa.id === conversaAtual?.id}
-            />
-          </div>
-        ))}
-    </div>
-  );
 
   return (
     <div className={classes.root}>

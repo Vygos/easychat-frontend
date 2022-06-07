@@ -1,53 +1,19 @@
-import {
-  Button,
-  Card,
-  Container,
-  Grid,
-  makeStyles,
-  Typography,
-} from "@material-ui/core";
+import { Button, Card, Container, Grid, Typography } from "@material-ui/core";
 import { useFormik } from "formik";
 import React, { useState } from "react";
-import { useDispatch } from "react-redux";
 import { Link, useHistory } from "react-router-dom";
-import * as yup from "yup";
 import { Usuario } from "../../model/usuario.model";
 import { OauthService } from "../../service/oauth.service";
 import Input from "../../shared/components/Input";
 import { Spinner } from "../../shared/components/Spinner";
 import Toast from "../../shared/components/Toast";
+import { getFormYup } from "./form-state";
+import loginStyle from "./login-style";
 import "./Login.css";
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    "& .MuiTextField-root": {
-      margin: theme.spacing(3),
-      width: 300,
-    },
-  },
-  card: {
-    marginTop: "5%",
-    width: "40%",
-    height: "500px",
-  },
-  button: {
-    margin: theme.spacing(),
-    width: 200,
-  },
-}));
-
-const schema = yup.object({
-  email: yup
-    .string()
-    .email("Deve possuir email válido")
-    .required("Campo obrigatório"),
-  password: yup.string().required("Campo obrigatório"),
-});
-
 function Login() {
-  const classes = useStyles();
+  const classes = loginStyle();
   const oauthService = new OauthService();
-  const dispatch = useDispatch();
   const history = useHistory();
 
   const [toast, setToast] = useState({
@@ -85,7 +51,7 @@ function Login() {
       email: "",
       password: "",
     },
-    validationSchema: schema,
+    validationSchema: getFormYup,
     onSubmit: handleSubmit,
   });
 

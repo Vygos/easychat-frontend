@@ -1,7 +1,6 @@
 import {
   combineReducers,
-  configureStore,
-  getDefaultMiddleware,
+  configureStore
 } from "@reduxjs/toolkit";
 import { enviroment } from "../env/easychat.env";
 import { USUARIO_SLICE } from "./constants/contants";

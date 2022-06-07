@@ -2,87 +2,27 @@ import {
   Button,
   Card,
   Container,
-  Grid,
-  makeStyles,
-  Typography,
+  Grid, Typography
 } from "@material-ui/core";
 import { useFormik } from "formik";
-import _ from "lodash";
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
-import * as yup from "yup";
 import { Usuario } from "../../model/usuario.model";
 import { OauthService } from "../../service/oauth.service";
 import { UsuarioService } from "../../service/usuario.service";
 import Input from "../../shared/components/Input";
 import Toast from "../../shared/components/Toast";
 import { Messages } from "../../shared/messages/validation-messages";
+import { getSignUpSchema } from "./form-state";
+import signUpStyle from "./signUp-style";
 import "./SignUp.css";
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    "& .MuiTextField-root": {
-      margin: theme.spacing(3),
-      width: 300,
-    },
-  },
-  card: {
-    marginTop: "5%",
-    width: "40%",
-    margin: "5% 0 5%",
-  },
-  button: {
-    margin: theme.spacing(),
-    width: 200,
-  },
-}));
-
-
 export function SignUp() {
+  const classes = signUpStyle();
   const oauthService = new OauthService();
   const usuarioService = new UsuarioService();
 
   const [toast, setToast] = useState({ open: false, msg: "", severity: "" });
-
-  let validateEmail = (value: string | undefined): Promise<boolean> => {
-    return new Promise((resolve, reject) => {
-      if (typeof value == "string") {
-        return usuarioService
-          .existsByEmail(value)
-          .then((response) => resolve(!response.data))
-          .catch((e) =>
-            setToast({
-              open: true,
-              severity: "error",
-              msg: "Erro interno do servidor, tente mais tarde !",
-            })
-          );
-      }
-      return resolve(true);
-    });
-  };
-
-  const schema = yup.object({
-    nome: yup.string().required(Messages.MSG001),
-    username: yup.string().required(Messages.MSG001),
-    email: yup
-      .string()
-      .email(Messages.MSG002)
-      .required(Messages.MSG001)
-      .test("hasEmailExist", Messages.MSG004, validateEmail),
-    password: yup
-      .string()
-      .required(Messages.MSG001)
-      .test("passwordDiff", Messages.MSG003, (value, { parent }) => {
-        return value === parent.confirmPassword;
-      }),
-    confirmPassword: yup
-      .string()
-      .required(Messages.MSG001)
-      .test("passwordDiff", Messages.MSG003, (value, { parent }) => {
-        return value === parent.password;
-      }),
-  });
 
   const handleSubmit = async (values: any) => {
     const sistema = {
@@ -135,11 +75,9 @@ export function SignUp() {
       password: "",
       confirmPassword: "",
     },
-    validationSchema: schema,
+    validationSchema: getSignUpSchema(setToast),
     onSubmit: handleSubmit,
   });
-
-  const classes = useStyles();
 
   return (
     <div className="background">
