@@ -54,7 +54,7 @@ export const updateUsuario = (usuario: Usuario) => async (dispatch) => {
 
 // ====== SELECTORS ===========
 
-export const usuarioSelector = (state: any) => state.usuarioInfo;
+export const usuarioSelector = (state: any) => state.usuarioInfo as UsuarioState;
 
 export const { assignUsuario, initLoadingUsuario, logout } = usuarioSlice.actions;
 

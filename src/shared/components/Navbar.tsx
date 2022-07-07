@@ -124,7 +124,6 @@ const Navbar = ({ extensible }: { extensible?: true }) => {
             </Grid>
             <Grid>
               <SearchUserAutocomplete
-                userPrincipal={userPrincipal}
                 onAddContato={onAddContato}
               />
             </Grid>

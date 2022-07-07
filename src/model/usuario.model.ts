@@ -5,6 +5,7 @@ export class Usuario {
     email: string;
     password?: string;
     dadosPessoais?: DadosPessoais;
+    added?: boolean;
 
     constructor(init: Partial<Usuario>) {
         Object.assign(this, init);
