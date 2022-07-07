@@ -29,9 +29,6 @@ export const SearchUserAutocomplete = ({
   const userPrincipal = useSelector(usuarioSelector);
 
   const handleAddContato = (option: Usuario) => {
-
-    console.log("user", userPrincipal)
-    console.log("user", option)
     const newAvisos = {
       tipo: TipoAviso.PEDIDO_AMIZADE,
       descricao: "Enviou um pedido de amizade",
