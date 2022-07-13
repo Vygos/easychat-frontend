@@ -7,8 +7,19 @@ import { SignUp } from "./pages/singup/SignUp";
 import { PrivateRoute } from "./shared/components/PrivateRoute";
 import "./App.css";
 import { Profile } from "./pages/profile/Profile";
+import { httpClient } from "./config/http/http-client";
+import useRequest from "./hooks/useRequest";
+
+const fetchCEP = () => {
+  return httpClient.get("https://viacep.com.br/ws/71697301/json")
+}
 
 const App = () => {
+
+  const response = useRequest(fetchCEP)
+
+  console.log("RESPONSE", response)
+
   return (
     <div className="app">
       <BrowserRouter>

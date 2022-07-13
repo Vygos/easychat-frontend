@@ -73,10 +73,15 @@ export const SearchUserAutocomplete = ({
       options={usuarios}
       loading={loading}
       renderOption={(option) => (
-        <ContatoOnSearch option={option} handleAddContato={handleAddContato} />
+        <ContatoOnSearch
+          data-testid="contato-on-search"
+          option={option}
+          handleAddContato={handleAddContato}
+        />
       )}
       renderInput={(params) => (
         <TextField
+          data-testid="fetchUserList"
           disabled
           {...params}
           placeholder="Pesquisar"

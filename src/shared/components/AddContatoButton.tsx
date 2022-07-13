@@ -12,7 +12,7 @@ const AddContatoButton: React.FC<{
       style={{ color: "#0ced13" }}
       onClick={() => handleAddContato(option)}
     >
-      <AddCircleOutline />
+      <AddCircleOutline data-testid="svg-icon-circle" />
     </IconButton>
   );
 };
