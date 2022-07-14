@@ -13,7 +13,6 @@ const useWebSocket = <T>(
   const rxStompWS = rxStomp;
 
   useEffect(() => {
-    console.log("usuario", usuario)
     if (usuario && !rxStompWS[type]) {
       rxStompWS.stomp
         .watch(`${topic}.${usuario?.dadosPessoais?.username}`)
@@ -22,11 +21,9 @@ const useWebSocket = <T>(
 
           setResponse(responseAsBody);
 
-          rxStomp[type] = true
-          
+          rxStomp[type] = true;
         });
     }
-    
   }, [usuario]);
 
   return { response };
