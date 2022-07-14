@@ -1,6 +1,5 @@
 const URLS: string[] = [
     "http://localhost:8080",
-    "https://viacep.com.br/"
 ]
 
 const WHITE_LIST = [

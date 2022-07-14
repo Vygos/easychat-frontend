@@ -15,6 +15,7 @@ import { CheckCircleOutline, Notifications } from "@material-ui/icons";
 import { forwardRef, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { rxStomp } from "../../config/ws/rx-stomp";
+import useWebSocket from "../../hooks/useWebSocket";
 import { Avisos } from "../../model/avisos.model";
 import { TipoAviso } from "../../model/enums/tipo-aviso.enum";
 import {
@@ -50,10 +51,12 @@ export const AvisosNotification = () => {
 
   const dispatch = useDispatch();
 
+  const [anchorElAvisos, setAnchorElAvisos] = useState<HTMLElement>(null);
+
   const { usuario } = useSelector(usuarioSelector) as UsuarioState;
   const { avisos } = useSelector(avisosSelector) as AvisosState;
 
-  const [anchorElAvisos, setAnchorElAvisos] = useState<HTMLElement>(null);
+  const { response } = useWebSocket("/topic/avisos", usuario, "avisosState");
 
   const isMenuOpenAvisos = Boolean(anchorElAvisos);
 
@@ -62,16 +65,10 @@ export const AvisosNotification = () => {
     : avisos;
 
   useEffect(() => {
-    if (usuario && !rxStomp.avisosState) {
-      rxStomp.stomp
-        .watch("/topic/avisos." + usuario.dadosPessoais.username)
-        .subscribe((message) => {
-          const newAviso = JSON.parse(message.body);
-          dispatch(novoAviso(newAviso));
-        });
-      rxStomp.avisosState = true;
+    if (response) {
+      dispatch(novoAviso(response));
     }
-  }, [usuario]);
+  }, [response]);
 
   const handleMenuOpenAvisos = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElAvisos(event.currentTarget);

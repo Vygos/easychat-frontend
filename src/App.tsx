@@ -1,24 +1,13 @@
-import React from "react";
 import { BrowserRouter, Redirect, Route, Switch } from "react-router-dom";
+import "./App.css";
 import Home from "./pages/home/Home";
 import Login from "./pages/login/Login";
 import { NotFound404 } from "./pages/notfound/NotFound404";
+import { Profile } from "./pages/profile/Profile";
 import { SignUp } from "./pages/singup/SignUp";
 import { PrivateRoute } from "./shared/components/PrivateRoute";
-import "./App.css";
-import { Profile } from "./pages/profile/Profile";
-import { httpClient } from "./config/http/http-client";
-import useRequest from "./hooks/useRequest";
-
-const fetchCEP = () => {
-  return httpClient.get("https://viacep.com.br/ws/71697301/json")
-}
 
 const App = () => {
-
-  const response = useRequest(fetchCEP)
-
-  console.log("RESPONSE", response)
 
   return (
     <div className="app">

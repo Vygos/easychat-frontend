@@ -5,11 +5,12 @@ import {
   Grid,
   makeStyles,
   Theme,
-  Typography
+  Typography,
 } from "@material-ui/core";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { rxStomp } from "../../config/ws/rx-stomp";
+import useWebSocket from "../../hooks/useWebSocket";
 import { Conversa } from "../../model/conversa.model";
 import { Mensagem } from "../../model/mensagem.model";
 import { useAppDispatch } from "../../redux";
@@ -20,12 +21,12 @@ import {
   incrementaBadge,
   loadConversas,
   novaConversa,
-  novaMensagem
+  novaMensagem,
 } from "../../redux/slices/conversas/conversasSlice";
 import {
   loadUsuario,
   usuarioSelector,
-  UsuarioState
+  UsuarioState,
 } from "../../redux/slices/usuario/usuarioSlice";
 import { OauthService } from "../../service/oauth.service";
 import { Chat } from "../../shared/components/Chat";
@@ -36,7 +37,6 @@ import { ProfilePicture } from "../../shared/components/ProfilePicture";
 import { Spinner } from "../../shared/components/Spinner";
 import Toast from "../../shared/components/Toast";
 import homeStyle from "./home-style";
-
 
 function Home() {
   const classes = homeStyle();
@@ -53,6 +53,9 @@ function Home() {
 
   const { usuario } = useSelector(usuarioSelector) as UsuarioState;
   const { conversaAtual } = useSelector(conversasSelector) as ConversasState;
+
+  const newMessageWs = useWebSocket<Mensagem>("/topic/chat", usuario, "chatState");
+  const newConversaWs = useWebSocket<Conversa>("/topic/conversa", usuario, "conversasState");
 
   useEffect(() => {
     (async () => {
@@ -77,41 +80,31 @@ function Home() {
     })();
   }, []);
 
-  const rxStompWS = rxStomp;
-
   useEffect(() => {
-    const { chatState, conversasState } = rxStompWS;
+    console.log("CHEGOU")
+    const { response } = newMessageWs;
 
-    if (usuario && !chatState && !conversasState) {
-      //subscribe to new Messages
-      rxStompWS.stomp
-        .watch("/topic/chat." + usuario?.dadosPessoais?.username)
-        .subscribe(({ body }) => {
-          let newMensagem = JSON.parse(body) as Mensagem;
-          dispatch(novaMensagem(newMensagem));
-          dispatch(incrementaBadge(newMensagem));
-          beepNotification();
-        });
-
-      //subscribe to new conversations
-      rxStompWS.stomp
-        .watch("/topic/conversa." + usuario?.dadosPessoais?.username)
-        .subscribe(({ body }) => {
-          let newConversa = JSON.parse(body) as Conversa;
-
-          const payload = {
-            conversa: newConversa,
-            idUsuario: usuario.id,
-          };
-
-          dispatch(novaConversa(payload));
-          beepNotification();
-        });
-
-      rxStompWS.chatState = true;
-      rxStompWS.conversasState = true;
+    if (response) {
+      dispatch(novaMensagem(response));
+      dispatch(incrementaBadge(response));
+      beepNotification();
     }
-  }, [usuario]);
+  }, [newMessageWs.response]);
+  
+  useEffect(() => {
+    const { response } = newConversaWs;
+    
+    if (response) {
+      
+      const payload = {
+        conversa: response,
+        idUsuario: usuario?.id,
+      };
+      
+      dispatch(novaConversa(payload));
+      beepNotification();
+    }
+  }, [newConversaWs.response]);
 
   const beepNotification = () => {
     if (document.hidden) {
