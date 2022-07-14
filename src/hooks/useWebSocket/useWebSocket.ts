@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Subscription } from "rxjs";
 import { rxStomp } from "../../config/ws/rx-stomp";
 import { Usuario } from "../../model/usuario.model";
 import { UseWebSocketResponse } from "./type";
@@ -13,8 +14,9 @@ const useWebSocket = <T>(
   const rxStompWS = rxStomp;
 
   useEffect(() => {
+    let subscription: Subscription;
     if (usuario && !rxStompWS[type]) {
-      rxStompWS.stomp
+      subscription = rxStompWS.stomp
         .watch(`${topic}.${usuario?.dadosPessoais?.username}`)
         .subscribe(({ body }) => {
           let responseAsBody = JSON.parse(body) as T;
@@ -23,6 +25,9 @@ const useWebSocket = <T>(
 
           rxStomp[type] = true;
         });
+    }
+    return () => {
+        subscription && subscription.unsubscribe();
     }
   }, [usuario]);
 
